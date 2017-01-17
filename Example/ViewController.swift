@@ -25,13 +25,16 @@ class ViewController: UIViewController, CalendarViewDelegate {
 
     //MARK: CalendarView Delegate
     
-    func didDragToDay(day: NSDateComponents, selectingRange: CalendarRange, withCalendarView: CalendarView) -> CalendarRange {
-        return selectingRange
+    func calendarView(_view: CalendarView, didDragToSelectedDay day: NSDateComponents, withCalendarRange range: CalendarRange) -> CalendarRange {
+        return range
     }
     
-    func didSelectRange(range: CalendarRange, withCalendarView: CalendarView) {
-        print("did select range \(range.startDay.date) - \(range.endDay.date))")
+    func calendarView(_ view: CalendarView, didSelectCalendarRange calendarRange: CalendarRange) {
+        print("did select range \(calendarRange.startDay.date) - \(calendarRange.endDay.date))")
+
     }
+    
+
 
 }
 

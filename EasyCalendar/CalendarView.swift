@@ -9,11 +9,13 @@
 import UIKit
 
 @objc protocol CalendarViewDelegate: NSObjectProtocol {
-    @objc optional func didSelectRange(range: CalendarRange, withCalendarView: CalendarView) -> Void
-    @objc optional func willChangeToVisibleMonth(month: NSDateComponents, duration: TimeInterval, withCalendarView: CalendarView) -> Void
-    @objc optional func didChangeToVisibleMonth(month: NSDateComponents, withCalendarView: CalendarView) -> Void
-    @objc optional func didDragToDay(day: NSDateComponents, selectingRange: CalendarRange, withCalendarView: CalendarView) -> CalendarRange
-    @objc optional func shouldAnimateDragToMonth(month: NSDateComponents, withCalendarView: CalendarView) -> Bool
+    
+    @objc optional func calendarView(_ view: CalendarView, didSelectCalendarRange calendarRange: CalendarRange)
+    @objc optional func calendarView(_ view: CalendarView, willChangeToVisibleMonth month: NSDateComponents, atDuration duration: TimeInterval)
+    @objc optional func calendarView(_view: CalendarView, didChangeToVisibleMonth month: NSDateComponents)
+    @objc optional func calendarView(_view: CalendarView, didDragToSelectedDay day: NSDateComponents, withCalendarRange range : CalendarRange) -> CalendarRange
+    @objc optional func calendarView(_view: CalendarView, shouldAnimateDragToMonth month: NSDateComponents) -> Bool
+
 }
 class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
     
@@ -245,14 +247,14 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
             self.setNeedsLayout()
             self.layoutIfNeeded()
             
-            if monthComparisonResult != .orderedSame && self.delegate.responds(to: #selector(CalendarViewDelegate.willChangeToVisibleMonth(month:duration:withCalendarView:))) {
-                self.delegate.willChangeToVisibleMonth!(month: month, duration: animationDuration, withCalendarView: self)
+            if monthComparisonResult != .orderedSame && self.delegate.responds(to: #selector(CalendarViewDelegate.calendarView(_:willChangeToVisibleMonth:atDuration:))) {
+                self.delegate.calendarView!(self, willChangeToVisibleMonth: month, atDuration: animationDuration)
             }
             }, completion: {(finished: Bool) -> Void in
                 self.isUserInteractionEnabled = true
                 if finished {
-                    if monthComparisonResult != .orderedSame && self.delegate.responds(to: #selector(CalendarViewDelegate.didChangeToVisibleMonth(month:withCalendarView:))) {
-                        self.delegate.didChangeToVisibleMonth!(month: month, withCalendarView: self)
+                    if monthComparisonResult != .orderedSame && self.delegate.responds(to: #selector(CalendarViewDelegate.calendarView(_view:didChangeToVisibleMonth:))) {
+                        self.delegate.calendarView!(_view: self, didChangeToVisibleMonth: month)
                     }
                 }
         })
@@ -313,9 +315,9 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
         } else {
             newRange = CalendarRange(startDay: touchedView!.day!, endDay: touchedView!.day!)
         }
-        if delegate.responds(to: #selector(CalendarViewDelegate.didDragToDay(day:selectingRange:withCalendarView:))) {
+        if delegate.responds(to: #selector(CalendarViewDelegate.calendarView(_view:didDragToSelectedDay:withCalendarRange:))) {
             if let range = newRange {
-                newRange = delegate.didDragToDay!(day: touchedView!.day!, selectingRange: range, withCalendarView: self)
+                newRange = delegate.calendarView!(_view: self, didDragToSelectedDay: touchedView!.day!, withCalendarRange: range)
             }
         }
         self.selectedRange = newRange
@@ -339,9 +341,11 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
         else {
             newRange = CalendarRange(startDay:self.draggingFixedDayComponents, endDay: touchedView!.day!)
         }
-        if delegate.responds(to: #selector(CalendarViewDelegate.didDragToDay(day:selectingRange:withCalendarView:))) {
-            newRange = delegate.didDragToDay!(day: touchedView!.day!, selectingRange: newRange, withCalendarView: self)
+        
+        if delegate.responds(to: #selector(CalendarViewDelegate.calendarView(_view:didDragToSelectedDay:withCalendarRange:))){
+            newRange = delegate.calendarView!(_view: self, didDragToSelectedDay: touchedView!.day!, withCalendarRange: newRange)
         }
+        
         self.selectedRange = newRange
         if !draggedOffStartDay {
             if !draggingStartDayComponents.isEqual(touchedView!.day) {
@@ -371,9 +375,13 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
             // Ask the delegate if it's OK to animate to the adjacent month
             var animateToAdjacentMonth: Bool = true
 
-            if delegate.responds(to: #selector(CalendarViewDelegate.shouldAnimateDragToMonth(month:withCalendarView:))) {
-                animateToAdjacentMonth = delegate.shouldAnimateDragToMonth!(month: touchedView!.dayAsDate.calendarViewMonthWithCalendar(calendar: visibleMonthComponents.calendar! as NSCalendar), withCalendarView: self)
+       
+            if delegate.responds(to: #selector(CalendarViewDelegate.calendarView(_view:shouldAnimateDragToMonth:))) {
+                animateToAdjacentMonth = delegate.calendarView!(_view: self, shouldAnimateDragToMonth: touchedView!.dayAsDate.calendarViewMonthWithCalendar(calendar: visibleMonthComponents.calendar! as NSCalendar))
+
             }
+            
+            
             if animateToAdjacentMonth {
                 
                 if touchedView!.dayAsDate.compare(visibleMonthComponents.date!) == .orderedAscending {
@@ -384,9 +392,9 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
                 }
             }
         }
-        if self.delegate.responds(to: #selector(CalendarViewDelegate.didSelectRange(range:withCalendarView:))) {
+        if self.delegate.responds(to: #selector(CalendarViewDelegate.calendarView(_:didSelectCalendarRange:))) {
             if let range = selectedRange {
-                delegate.didSelectRange!(range: range, withCalendarView: self)
+                delegate.calendarView!(self, didSelectCalendarRange: range)
             }
         }
     }
