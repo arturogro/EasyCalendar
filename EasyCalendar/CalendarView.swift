@@ -111,11 +111,6 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
     
     //MARK: Utility Methods
     
-    func setVisibleMonth(visibleMonth: NSDateComponents) -> Void
-    {
-        setVisibleMonth(visibleMonth: visibleMonth, animated: false)
-    }
-    
     func setVisibleMonth(visibleMonth: NSDateComponents, animated: Bool)
     {
         let fromMonth: NSDateComponents = visibleMonth
