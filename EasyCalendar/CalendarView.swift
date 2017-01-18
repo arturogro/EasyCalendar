@@ -72,8 +72,8 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
         setupMonthSelectorView()
     
         setupMonthContainers()
-        
-        updateMonthLabelMonth(month: visibleMonthComponents)
+    
+        updateMonthTitleLabelUsing(visibleMonthComponents)
         
         positionViewsForMonth(month: visibleMonthComponents, fromMonth: visibleMonthComponents, animated: false)
    }
@@ -95,7 +95,7 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
     }
     
     // Month views are contained in a content view inside a container view - like a scroll view, but not a scroll view so we can have proper control over animations
-    private func setupMonthContainers(){
+    private func setupMonthContainers() {
         var frame = self.bounds
         frame.origin.x = 0
         frame.origin.y = monthSelectorView.frame.maxY
@@ -111,11 +111,10 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
     
     //MARK: Utility Methods
     
-    func setVisibleMonth(visibleMonth: NSDateComponents, animated: Bool)
-    {
+    func setVisibleMonth(visibleMonth: NSDateComponents, animated: Bool) {
         let fromMonth: NSDateComponents = visibleMonth
         self.visibleMonthComponents = visibleMonth.date!.calendarViewMonthWithCalendar(calendar: visibleMonth.calendar! as NSCalendar)
-        updateMonthLabelMonth(month: visibleMonth)
+        updateMonthTitleLabelUsing(visibleMonth)
         positionViewsForMonth(month: visibleMonth, fromMonth: fromMonth, animated: animated)
     }
     
@@ -137,11 +136,10 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
     
     //MARK: Helper Methods
     
-    func updateMonthLabelMonth(month: NSDateComponents)
-    {
+    func updateMonthTitleLabelUsing(_ components: NSDateComponents) {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
-        let date = Calendar.current.date(from: month as DateComponents)
+        let date = Calendar.current.date(from: components as DateComponents)
         monthSelectorView.titleLabel.text = formatter.string(from: date!)
     }
     
