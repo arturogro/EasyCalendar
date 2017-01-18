@@ -48,7 +48,7 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
     var draggingFixedDayComponents: NSDateComponents!
     var draggedOffStartDay: Bool = false
     
-    var dayViewHeight: CGFloat!
+    var dayViewHeight: CGFloat = 44
     
     var monthViews = [String : CalendarMonthView]()
     
@@ -64,12 +64,27 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
         setupView()
     }
     
+    
     func setupView()
     {
-        dayViewHeight = 44
+        prepareDataContent()
+    
+        setupMonthSelectorView()
+    
+        setupMonthContainers()
+        
+        updateMonthLabelMonth(month: visibleMonthComponents)
+        
+        positionViewsForMonth(month: visibleMonthComponents, fromMonth: visibleMonthComponents, animated: false)
+   }
+    
+    private func prepareDataContent() {
         visibleMonthComponents = NSCalendar.current.dateComponents([.year, .month, .day, .weekday, .calendar], from: NSDate() as Date) as NSDateComponents!
         visibleMonthComponents.day = 1
         showDayCalloutView = true
+    }
+    
+    private func setupMonthSelectorView() {
         var monthSelectorFrame = self.bounds
         monthSelectorFrame.size.height = monthSelectorView.bounds.size.height
         monthSelectorView.backgroundColor = UIColor.clear
@@ -77,8 +92,10 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
         monthSelectorView.delegate = self
         monthSelectorView.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
         self.addSubview(monthSelectorView)
-        
-        // Month views are contained in a content view inside a container view - like a scroll view, but not a scroll view so we can have proper control over animations
+    }
+    
+    // Month views are contained in a content view inside a container view - like a scroll view, but not a scroll view so we can have proper control over animations
+    private func setupMonthContainers(){
         var frame = self.bounds
         frame.origin.x = 0
         frame.origin.y = monthSelectorView.frame.maxY
@@ -90,10 +107,7 @@ class CalendarView : UIView, CalendarMonthSelectorViewDelegate {
         
         monthContainerViewContentView = UIView(frame: monthContainerView.frame)
         monthContainerView.addSubview(monthContainerViewContentView)
-        
-        updateMonthLabelMonth(month: visibleMonthComponents)
-        positionViewsForMonth(month: visibleMonthComponents, fromMonth: visibleMonthComponents, animated: false)
-   }
+    }
     
     //MARK: Utility Methods
     
