@@ -13,7 +13,7 @@ With this control you can select a single date or a date range. <br />
 3. Conform your View Controler with `CalendarViewDelegate` protocol, and set the delegate.
 
   ```swift
-    calendarView.delegate = self
+  calendarView.delegate = self
   ```
 4. Implement the protocol methods that you need for your project.
 
