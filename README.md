@@ -20,5 +20,3 @@ With this control you can select a single date or a date range. <br />
 ## Preview
 <img src="http://i.imgur.com/T6WEsPU.png" width="269" height="479" />
 
-##License
-MIT
